@@ -44,6 +44,18 @@ app.get('/feedback', (req, res) => {
   });
 });
 
+app.get('/books', (req, res) => {
+  db.all("SELECT * FROM books", (err, result) => {
+    if (err) {
+      return res.status(500).send(err.message);
+    }
+    res.render('books', { 
+      title: 'Books',
+      data: result, 
+      });
+  });
+});
+
 app.post('/search', (req, res) => {
   const { search } = req.body;
   const query = `SELECT * FROM feedback WHERE icecreamtype LIKE '%${search}%'`;
