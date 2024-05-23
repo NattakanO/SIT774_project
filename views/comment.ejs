@@ -1,0 +1,57 @@
+<%- include('header'); -%>
+
+<header>
+  <div class="container-fluid bg-info-subtle mb-4">
+      <div class="col-sm-8 mx-auto text-center py-2">
+          <h1 class="display-4">World of Ice Cream</h1>
+          <p class="lead ">Feedback from ice cream lovers....</p>
+      </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+      <h3><%= title %></h3>
+      <% if(title === "Comment List") { %>
+        <p>it is time to find out what people really think about <strong>Ice Cream</strong> and the easiest way is to ask them directly. Web-based forms offer a great method to gathering all sorts of information. The trick is how to store/use it on the server.</p>
+      <%} else {%>
+       <p>Thank you for your request to search for comments based on <strong>Ice cream type</strong></p>
+       <p>Below is a list of feedback form the database using the search term <code>'<%= search %>'</code></p>
+      <%}%>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Icecream type</th>
+            <th scope="col">Rating</th>
+            <th scope="col">Feedback</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if(data.length){ %>
+          <% for (let i = 0; i < data.length; i++) { %>
+            <tr>
+              <th scope="row"><%= data[i].id %></th>
+              <td><%= data[i].name %></td>
+              <td><%= data[i].icecreamtype %></td>
+              <td><% for ( let j = 0; j < data[i].rating ; j++ ) { %>
+                ★
+              <% } %>
+              </td>
+              <td><%= data[i].feedback %></td>
+            </tr>
+          <% } %>
+          <% } else {  %>
+            <tr class="text-center">
+              <td colspan="5">couldn't find any feedback related to your search for <strong><%= search %></strong></td>
+            </tr>
+         <% } %>
+        </tbody>
+      </table>
+      <a href="http://localhost:3000/"> Click here to return to feedback form</a>
+
+  </div>
+</main>
+
+<%- include('footer'); -%>

@@ -1,0 +1,49 @@
+<%- include('header'); -%>
+
+<header>
+  <div class="container-fluid bg-info-subtle mb-4">
+      <div class="col-sm-8 mx-auto text-center py-2">
+          <h1 class="display-4">World of Ice Cream</h1>
+          <p class="lead ">Feedback from ice cream lovers....</p>
+      </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+      <h3><%= title %></h3>
+      <% if (name && rating && icecreamtype && (rating <= 5) && feedback) { %>
+      <p>
+          Thank you <strong> <%= name %></strong> for your feedback and rating on your favorite ice cream<strong> <%= icecreamtype %></strong>
+      </p>
+
+      <p> You gave us a score of <strong><%= rating %> </strong>out of 5</p>
+      <p>Feedback provided was: <strong><%= feedback %></strong> </p>
+        <% if (rating <= 2) { %>
+          <hr>
+          <h3 class="text-danger">&#x1F622;We are really sorry to hear that you didn't like the <%= icecreamtype %></h3>
+          <hr>
+        <% } else { %>
+          <p>Hi</p>
+          <hr>
+          <h3 class="text-success">&#x1F60A;That's fantastic!! That is wonderful you liked the <%= icecreamtype %></h3>
+          <hr>
+        <% } %>
+      <a href="http://localhost:3000/"> Click here to return to feedback form</a>
+      <% } else if (!name) { %>
+        <p>There was a problem with your data</p>
+        <p>Error is form field: <strong class="text-danger"> name</strong> </p>
+      <% } else if (!icecreamtype) { %>
+        <p>There was a problem with your data</p>
+        <p>Error is form field: <strong class="text-danger"> ice cream type</strong> </p>
+      <% } else if (!rating || rating > 5) { %>  
+        <p>There was a problem with your data</p>
+        <p>Error is form field: <strong class="text-danger"> score</strong> </p>
+      <% } else if (!feedback) { %>
+          <p>There was a problem with your data</p>
+          <p>Error is form field: <strong class="text-danger"> feedback</strong> </p>
+      <% } %>
+  </div>
+</main>
+
+<%- include('footer'); -%>
