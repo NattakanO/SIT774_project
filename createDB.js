@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
-
+const bcrypt = require('bcrypt');
 const db = new sqlite3.Database('projectDB.db', (err) => {
     if (err) {
         console.error(err.message);
@@ -18,6 +18,7 @@ db.serialize(() => {
         first_name TEXT,
         last_name TEXT,
         phone_number TEXT,
+        type TEXT DEFAULT 'customer',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
@@ -87,8 +88,8 @@ db.serialize(() => {
         order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         status TEXT NOT NULL,
         total_amount REAL NOT NULL,
-        payment_id INTEGER,
-        shipping_id INTEGER NOT NULL,
+        payment_id INTEGER NULL,
+        shipping_id INTEGER NULL,
         FOREIGN KEY (user_id) REFERENCES Users(user_id),
         FOREIGN KEY (payment_id) REFERENCES PaymentMethods(payment_id),
         FOREIGN KEY (shipping_id) REFERENCES ShippingAddresses(address_id)
@@ -132,8 +133,11 @@ db.serialize(() => {
         book_id INTEGER NOT NULL,
         FOREIGN KEY (book_id) REFERENCES Books(book_id)
     )`);
-});
 
+    db.run(`INSERT INTO Users (username, password_hash, email, first_name, last_name, phone_number, type)
+    VALUES ('admin', '$2a$10$3snEfgGIYtXdF3sUOBGUdOqaWuxTlpEMUMmx81c.88kDGZ18LyBzW', 'admin@example.com', 'Admin', 'User', '1234567890', 'admin')`,);
+
+});
 const books = [
     {
       title: "To Kill a Mockingbird",
