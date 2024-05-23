@@ -31,7 +31,15 @@ app.get('/', (req, res, next) => {
           console.error('Error querying database:', err);
           return;
       }
-      res.render('books', { books:rows , username: req.session.username});
+      
+      db.all('SELECT * FROM Bestsellers as bs JOIN Books as b on b.book_id = bs.book_id ', (err, bestseller) => {
+        if (err) {
+            console.error('Error querying database:', err);
+            return;
+        }
+        
+        res.render('books', { books:rows , username: req.session.username, bestseller:bestseller});
+    });
   });
 });
 

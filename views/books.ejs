@@ -39,7 +39,7 @@
   .card:hover .card-title-overlay {
     display: block;
   }
-  .card-body {
+  .hidden-card-body {
     display: none;
   }
   .carousel-inner {
@@ -52,7 +52,13 @@
   .no-caret::after {
     display: none !important;
   }
-  
+  .badge-primary {
+    background-color: #94618E;;
+    color: #fff;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    border-radius: 0.5em;
+  }
   @media (max-width: 767px) {
     .carousel-inner {
       height: auto; 
@@ -147,20 +153,32 @@
 </nav>
 
 <section class="container my-5">
-  <h2 class="text-center mb-4">Bestsellers</h2>
+  <h1 class="text-center mb-2">Bestsellers</h1>
   <div class="row justify-content-center">
-      <div class="col-md-10">
- 
-          <div class="card">
-              <div class="card-body">
-                 
+    <div class="row row-cols-1 row-cols-md-5 g-4">
+      <% bestseller.forEach(function(book, index) { %>
+        <div class="col">
+          <a href="/bookdetail/<%= book.book_id %>" class="text-decoration-none">
+            <div class="card h-100 position-relative">
+              <img src="<%= book.cover_image_url %>" class="card-img-top book-image" alt="<%= book.title %>">
+              <div class="badge badge-primary position-absolute top-0 start-0 m-2">
+                #<%= index + 1 %>
               </div>
-          </div>
-      </div>
+              <div class="card-title-overlay">
+                <h5 class="card-title"><%= book.title %></h5>
+              </div>
+              <div class="card-body hidden-card-body">
+                <a href="/bookdetail/<%= book.book_id %>" class="btn btn-primary">View Details</a>
+              </div>
+            </div>
+          </a>
+        </div>
+      <% }); %>
+    </div>
   </div>
 </section>
 
-<section class="container mb-5">
+<section class="container mb-2">
   <h2 class="text-center mb-4">All Books</h2>
   <div class="row justify-content-center">
     <div class="container my-5">
@@ -173,7 +191,7 @@
                       <div class="card-title-overlay">
                           <h5 class="card-title"><%= book.title %></h5>
                       </div>
-                      <div class="card-body">
+                      <div class="card-body hidden-card-body">
                         <!-- <h5 class="card-title title-hidden"><%= book.title %></h5> -->
                         <a href="/bookdetail/<%= book.book_id %>" class="btn btn-primary">View Details</a>
                       </div>
