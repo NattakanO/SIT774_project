@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require('morgan');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('myDB');
+const db = new sqlite3.Database('projectDB.db');
 var app = express();
 
 app.set('views', path.join(__dirname, 'views')); 
