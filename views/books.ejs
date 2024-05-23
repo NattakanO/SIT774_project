@@ -52,12 +52,7 @@
   .no-caret::after {
     display: none !important;
   }
-  .navbar-nav .nav-item .dropdown-menu {
-    display: none;
-  }
-  .navbar-nav .nav-item:hover .dropdown-menu {
-    display: block;
-  }
+  
   @media (max-width: 767px) {
     .carousel-inner {
       height: auto; 
@@ -172,15 +167,15 @@
       <div class="row row-cols-1 row-cols-md-4 g-4">
           <% books.forEach(function(book) { %>
               <div class="col">
-                  <a href="/book/<%= book.book_id %>" class="text-decoration-none">
+                  <a href="/bookdetail/<%= book.book_id %>" class="text-decoration-none">
                   <div class="card h-100">
                       <img src="<%= book.cover_image_url %>" class="card-img-top book-image" alt="<%= book.title %>">
                       <div class="card-title-overlay">
                           <h5 class="card-title"><%= book.title %></h5>
                       </div>
                       <div class="card-body">
-                        <h5 class="card-title title-hidden"><%= book.title %></h5>
-                        <a href="/book/<%= book.book_id %>" class="btn btn-primary">View Details</a>
+                        <!-- <h5 class="card-title title-hidden"><%= book.title %></h5> -->
+                        <a href="/bookdetail/<%= book.book_id %>" class="btn btn-primary">View Details</a>
                       </div>
                   </div>
               </div>

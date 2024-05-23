@@ -31,7 +31,6 @@ app.get('/', (req, res, next) => {
           console.error('Error querying database:', err);
           return;
       }
-      console.log(rows)
       res.render('books', { books:rows , username: req.session.username});
   });
 });
@@ -163,6 +162,8 @@ app.get('/cart', (req, res) => {
       res.render('cart', {username: req.session.username});
   // });
 });
+
+
 app.post('/feedback', (req, res) => {
   const { name, rating, feedback, icecreamtype } = req.body;
   db.run("INSERT INTO feedback (name, icecreamtype, rating, feedback) VALUES (?, ?, ?, ?)", [name, icecreamtype, rating, feedback], function(err) {
@@ -203,6 +204,28 @@ app.get('/books', (req, res) => {
   });
 });
 
+//book information
+app.get('/bookdetail/:book_id', (req, res) => {
+  const book_id = req.params.book_id;
+  const query = `SELECT * FROM Books WHERE book_id = ${book_id}`;
+  db.all(query,function(err, bookdetail) {
+    if (err) {
+      return res.status(500).send(err.message);
+    }
+    console.log(bookdetail[0])
+    db.all(`SELECT * FROM Books WHERE book_id != ${bookdetail[0].book_id} and genre = "${bookdetail[0].genre}" LIMIT 10`,function(err, books) {
+      if (err) {
+        return res.status(500).send(err.message);
+      }
+      res.render('bookDetail', { 
+        title: bookdetail[0].title,
+        book: bookdetail[0], 
+        books: books,
+        username: req.session.username
+        });
+    });
+  });
+});
 app.post('/search', (req, res) => {
   const { search } = req.body;
   const query = `SELECT * FROM feedback WHERE icecreamtype LIKE '%${search}%'`;

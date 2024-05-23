@@ -1,0 +1,69 @@
+<%- include('header'); -%>
+<%- include('navbar.ejs', username) %>
+<div class="col-md-10 mx-auto">
+  
+  <div class="row bg-white p-4 my-4 rounded">
+    <div class="col-md-5 text-center">
+      <h2 class="text-start"><%= book.title %></h2>
+      <img src="../<%= book.cover_image_url %>" alt="<%= book.title %>" width="250" height="auto">
+    </div>
+    <div class="col-md-5">
+      <div class="book-info">
+        <p><strong>Author:</strong> <%= book.author %></p>
+        <p><strong>Publisher:</strong> <%= book.publisher %></p>
+        <p><strong>Genre:</strong> <%= book.genre %></p>
+        <p><strong>Description:</strong> <%= book.description %></p>
+        <% const publicationDate = new Date(book.publication_date); %>
+        <p><strong>Publication Date:</strong> <%= publicationDate.toLocaleDateString() %></p>
+        <p><strong>ISBN:</strong> <%= book.ISBN %></p>
+        <p><strong>Price:</strong> $<%= book.price.toFixed(2) %></p>
+        <p><strong>Stock Quantity:</strong> <%= book.stock_quantity %></p>
+        
+        <form action="/add-to-cart" method="post">
+          <input type="hidden" name="book_id" value="<%= book.book_id %>">
+          <button class="btn btn-danger" type="submit">Add to Cart</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- You May Also Like carousel -->
+<div id="you-may-also-like" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <% for (let i = 0; i < Math.ceil(books.length / 5); i++) { %>
+        <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+            <div class="row">
+                <% for (let j = i * 5; j < Math.min((i + 1) * 5, books.length); j++) { %>
+                    <div class="col-md-2">
+                        <div class="card">
+                            <img src="../<%= books[j].cover_image_url %>" class="card-img-top" alt="<%= books[j].title %>">
+                            <div class="card-body">
+                                <h5 class="card-title"><%= books[j].title %></h5>
+                                <p class="card-text"><%= books[j].author %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+</div>
+<button class="carousel-control-prev" type="button" data-bs-target="#you-may-also-like" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+</button>
+<button class="carousel-control-next" type="button" data-bs-target="#you-may-also-like" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+</button>
+</div>
+</div>
+<!-- List of reviews -->
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
