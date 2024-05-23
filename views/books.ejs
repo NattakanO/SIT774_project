@@ -1,0 +1,198 @@
+<%- include('header'); -%>
+<%- include('navbar.ejs', username) %>
+<style>
+  .book-image {
+    height: 400px; 
+    width: 100%; 
+    object-fit: cover; 
+  }
+  .card {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .card:hover {
+    transform: scale(1.05);
+  }
+
+  .card-img-top {
+    transition: transform 0.2s;
+  }
+
+  .card:hover .card-img-top {
+    transform: scale(1.1);
+  }
+  .card-title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    text-align: center;
+    display: none;
+    transition: background 0.2s;
+  }
+  .card:hover .card-title-overlay {
+    display: block;
+  }
+  .card-body {
+    display: none;
+  }
+  .carousel-inner {
+      height: 400px;
+  }    
+  .carousel-item img {
+      height: 100%;
+      object-fit: cover;
+  }
+  .no-caret::after {
+    display: none !important;
+  }
+  .navbar-nav .nav-item .dropdown-menu {
+    display: none;
+  }
+  .navbar-nav .nav-item:hover .dropdown-menu {
+    display: block;
+  }
+  @media (max-width: 767px) {
+    .carousel-inner {
+      height: auto; 
+    }
+    .carousel-item img {
+      height: auto; 
+      object-fit: contain; 
+    }
+  } 
+</style>
+<div class="col-md-10 mx-auto" style="background-color: #F8EEE7;">
+
+
+<header>
+  <div id="bookBanner" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="images/carousel_image_1.jpg" class="d-block w-100" alt="Carousel Image 1">
+      </div>
+      <div class="carousel-item">
+        <img src="images/carousel_image_2.jpg" class="d-block w-100" alt="Carousel Image 2">
+      </div>
+      <div class="carousel-item">
+        <img src="images/carousel_image_3.jpg" class="d-block w-100" alt="Carousel Image 3">
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#bookBanner" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#bookBanner" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</header> 
+
+<nav class="navbar navbar-expand-lg" style="background-color: #f4dec8;">
+  <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#bookNav" aria-controls="bookNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-center" id="bookNav">
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle no-caret" href="#" id="fictionDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Fiction
+                </a>
+                <div class="dropdown-menu" aria-labelledby="fictionDropdown">
+                    <a class="dropdown-item" href="#">Romance</a>
+                    <a class="dropdown-item" href="#">Mystery</a>
+                    <a class="dropdown-item" href="#">Thriller</a>
+                    <a class="dropdown-item" href="#">Sci-Fi</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle no-caret" href="#" id="nonFictionDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
+                    Non-Fiction
+                </a>
+                <div class="dropdown-menu" aria-labelledby="nonFictionDropdown">
+                    <a class="dropdown-item" href="#">Biography</a>
+                    <a class="dropdown-item" href="#">History</a>
+                    <a class="dropdown-item" href="#">Self-Help</a>
+                    <a class="dropdown-item" href="#">Science</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle no-caret" href="#" id="kidsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
+                    Kids
+                </a>
+                <div class="dropdown-menu" aria-labelledby="kidsDropdown">
+                    <a class="dropdown-item" href="#">Picture Books</a>
+                    <a class="dropdown-item" href="#">Early Readers</a>
+                    <a class="dropdown-item" href="#">Middle Grade</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle no-caret" href="#" id="textbookDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
+                    Textbook
+                </a>
+                <div class="dropdown-menu" aria-labelledby="textbookDropdown">
+                    <a class="dropdown-item" href="#">Math</a>
+                    <a class="dropdown-item" href="#">Science</a>
+                    <a class="dropdown-item" href="#">History</a>
+                    <a class="dropdown-item" href="#">Language Arts</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    
+  </div>
+</nav>
+
+<section class="container my-5">
+  <h2 class="text-center mb-4">Bestsellers</h2>
+  <div class="row justify-content-center">
+      <div class="col-md-10">
+ 
+          <div class="card">
+              <div class="card-body">
+                 
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+<section class="container mb-5">
+  <h2 class="text-center mb-4">All Books</h2>
+  <div class="row justify-content-center">
+    <div class="container my-5">
+      <div class="row row-cols-1 row-cols-md-4 g-4">
+          <% books.forEach(function(book) { %>
+              <div class="col">
+                  <a href="/book/<%= book.book_id %>" class="text-decoration-none">
+                  <div class="card h-100">
+                      <img src="<%= book.cover_image_url %>" class="card-img-top book-image" alt="<%= book.title %>">
+                      <div class="card-title-overlay">
+                          <h5 class="card-title"><%= book.title %></h5>
+                      </div>
+                      <div class="card-body">
+                        <h5 class="card-title title-hidden"><%= book.title %></h5>
+                        <a href="/book/<%= book.book_id %>" class="btn btn-primary">View Details</a>
+                      </div>
+                  </div>
+              </div>
+          <% }); %>
+      </div>
+  </div>
+</div>
+</section> 
+</div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+

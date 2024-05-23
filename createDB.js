@@ -12,9 +12,9 @@ db.serialize(() => {
     // Users table
     db.run(`CREATE TABLE IF NOT EXISTS Users (
         user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
+        username TEXT NOT NULL,
         password_hash TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE,
+        email TEXT NOT NULL,
         first_name TEXT,
         last_name TEXT,
         phone_number TEXT,
