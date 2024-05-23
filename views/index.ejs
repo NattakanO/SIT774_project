@@ -1,0 +1,66 @@
+<%- include('header'); -%>
+<%- include('navbar.ejs', username) %>
+<style>
+body, html {
+  height: 100%;
+  margin: 0;
+}
+
+.parallax {
+  background-image: url('images/bg1.png');
+  height: 100%; 
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.65;
+}
+
+.parallax2 {
+  background-image: url('images/bg2.png');
+  height: 100%; 
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.65;
+}
+.caption {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    color: #000;
+}
+.content {
+  padding: 20px;
+  text-align: center;
+  background-color: #94618E;
+  color: white;
+}
+.caption span.border {
+    background-color: #94618E;
+    color: #fff;
+    padding: 18px;
+    font-size: 40px;
+    letter-spacing: 10px;
+}
+</style>
+
+<div class="parallax">
+  <div class="caption">
+    <span class="border">CHAPTERS</span>
+  </div>
+</div>
+
+<div class="content">
+  <h1>Welcome to CHAPTERS</h1>
+  <p>Explore our vast collection of books covering various genres, from fiction to non-fiction, mystery to romance, and more!</p>
+  <p>Whether you're a bookworm or just love to dive into a good story, our bookstore has something for everyone.</p>
+  <p>Stay tuned for upcoming events, author signings, and special promotions!</p>
+</div>
+
+<div class="parallax2"></div>
+
+<%- include('footer'); -%>
