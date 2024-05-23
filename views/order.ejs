@@ -1,0 +1,46 @@
+<%- include('header'); -%>
+<%- include('navbar.ejs', username) %>
+<div class="container my-5">
+    <h2>My Orders</h2>
+    <% if (orders.length > 0) { %>
+        <div class="list-group">
+            <% orders.forEach(function(order) { %>
+                <% 
+                    let statusColor;
+                    switch (order.status) {
+                        case 'Pending':
+                            statusColor = 'text-warning';
+                            break;
+                        case 'Shipped':
+                            statusColor = 'text-primary';
+                            break;
+                        case 'Delivered':
+                            statusColor = 'text-success';
+                            break;
+                        case 'Cancelled':
+                            statusColor = 'text-danger';
+                            break;
+                        default:
+                            statusColor = 'text-secondary';
+                    }
+                    const orderDate = new Date(order.order_date);
+                    const formattedDate = orderDate.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                %>
+                <a href="/order/<%= order.order_id %>" class="list-group-item list-group-item-action">
+                    <span>Order #<%= order.order_id %> - <%= formattedDate %></span>
+                    <span class="<%= statusColor %> float-end"><%= order.status %></span>
+                </a>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <p>You have no orders yet.</p>
+    <% } %>
+</div>
+
+<%- include('footer'); -%>

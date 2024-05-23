@@ -167,7 +167,7 @@ app.get('/profile', (req, res) => {
   });
 });
 
-app.get('/cart', (req, res) => {
+app.get('/cart', IsLoggedin,(req, res) => {
   const userId = req.session.user_id;
   const query = `
     SELECT ci.cart_item_id, b.title, b.price, b.cover_image_url, ci.quantity
@@ -335,17 +335,17 @@ app.get('/feedback', (req, res) => {
   });
 });
 
-app.get('/books', (req, res) => {
-  db.all("SELECT * FROM books", (err, result) => {
-    if (err) {
-      return res.status(500).send(err.message);
-    }
-    res.render('books', { 
-      title: 'Books',
-      data: result, 
-      });
-  });
-});
+// app.get('/books', (req, res) => {
+//   db.all("SELECT * FROM books", (err, result) => {
+//     if (err) {
+//       return res.status(500).send(err.message);
+//     }
+//     res.render('books', { 
+//       title: 'Books',
+//       data: result, 
+//       });
+//   });
+// });
 
 //book information
 app.get('/bookdetail/:book_id', (req, res) => {
@@ -424,15 +424,34 @@ app.post('/checkout', IsLoggedin, async (req, res) => {
 app.get('/order/:orderId', IsLoggedin, (req, res) => {
   const { orderId } = req.params;
 
-  db.get('SELECT * FROM Orders WHERE order_id = ?', [orderId], (err, orders) => {
+  db.get('SELECT * FROM Orders WHERE order_id = ?', [orderId], (err, order) => {
+    if (err) {
+      console.error('Error querying order:', err);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
+    if (!order) {
+      res.status(404).send('Order not found');
+      return;
+    }
+
+    db.all('SELECT OrderItems.*, Books.title, Books.cover_image_url FROM OrderItems INNER JOIN Books ON OrderItems.book_id = Books.book_id WHERE order_id = ?', [orderId], (err, orderItems) => {
       if (err) {
-          console.error('Error querying order:', err);
-          res.status(500).send('Internal Server Error');
-          return;
+        console.error('Error querying order items:', err);
+        res.status(500).send('Internal Server Error');
+        return;
       }
-      res.render('order', { orders, username: req.session.username });
+
+      res.render('orderDetail', {
+        order,
+        orderItems,
+        username: req.session.username
+      });
+    });
   });
 });
+
 
 app.get('/orders', IsLoggedin, (req, res) => {
   const userId = req.session.user_id;
