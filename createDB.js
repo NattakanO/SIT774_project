@@ -469,16 +469,16 @@ const books = [
 
 const bestsellers = [
   {
-      book_id: 1,
+      book_id: 8,
   },
   {
-      book_id: 2,
+      book_id: 6,
   },
   {
-      book_id: 3,
+      book_id: 10,
   },
   {
-      book_id: 4,
+      book_id: 16,
   },
   {
       book_id: 5,
