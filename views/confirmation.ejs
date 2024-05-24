@@ -1,0 +1,63 @@
+<%- include('header'); -%>
+<%- include('navbar.ejs', username) %>
+<style>
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn ease-in 1;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .slide-in {
+    transform: translateY(50px);
+    opacity: 0;
+    animation: slideIn ease-out 1;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes slideIn {
+    0% {
+      transform: translateY(50px);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+</style>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <div class="fade-in">
+        <h1 style="color: #94618E;">Order Confirmation</h1>
+        <p class="lead">Thank you for your purchase, <%= username %>!</p>
+        <p>Your order has been successfully placed. You will receive a confirmation email shortly.</p>
+      </div>
+      <div class="slide-in mt-4">
+        <a href="/" class="btn mt-3" style="background-color: #94618E; color: white;">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('.fade-in').classList.add('active');
+    document.querySelector('.slide-in').classList.add('active');
+  });
+</script>
+<%- include('footer'); -%>
