@@ -48,7 +48,7 @@ app.get('/books', (req, res, next) => {
             return;
         }
         
-        res.render('books', { books:rows , username: req.session.username, bestseller:bestseller});
+        res.render('books', { books:rows , username: req.session.username, bestseller:bestseller, search: ""});
     });
   });
 });
@@ -170,7 +170,7 @@ app.get('/profile', (req, res) => {
 app.get('/cart', IsLoggedin,(req, res) => {
   const userId = req.session.user_id;
   const query = `
-    SELECT ci.cart_item_id, b.title, b.price, b.cover_image_url, ci.quantity
+    SELECT ci.cart_item_id,ci.cart_id, b.title, b.price, b.cover_image_url, ci.quantity
     FROM CartItems ci
     JOIN Books b ON ci.book_id = b.book_id
     JOIN ShoppingCart sc ON ci.cart_id = sc.cart_id
@@ -183,7 +183,7 @@ app.get('/cart', IsLoggedin,(req, res) => {
       res.status(500).send('Internal Server Error');
       return;
     }
-
+    console.log(rows)
     res.render('cart', { cartItems: rows , username: req.session.username});
   });
 });
@@ -223,8 +223,10 @@ app.post('/add-to-cart', IsLoggedin, (req, res) => {
           console.error('Error creating shopping cart:', err);
           res.status(500).send('Internal Server Error');
           return;
+        }else{
+          console.log('Create a new Cart successfully!')
         }
-        addItemToCart(this.lastID);
+        addItemToCart(this.lastID,book_id, quantity);
       });
       }
   });
@@ -307,46 +309,6 @@ app.post('/cart/update/:cart_item_id', IsLoggedin, (req, res) => {
   });
 });
 
-app.post('/feedback', (req, res) => {
-  const { name, rating, feedback, icecreamtype } = req.body;
-  db.run("INSERT INTO feedback (name, icecreamtype, rating, feedback) VALUES (?, ?, ?, ?)", [name, icecreamtype, rating, feedback], function(err) {
-    if (err) {
-      return res.status(500).send(err.message);
-    }
-    res.render('feedback', { 
-      title: 'Feedback',
-      icecreamtype: icecreamtype, 
-      feedback: feedback,
-      rating: rating,
-      name: name
-      });
-  });
-});
-
-app.get('/feedback', (req, res) => {
-  db.all("SELECT * FROM feedback", (err, result) => {
-    if (err) {
-      return res.status(500).send(err.message);
-    }
-    res.render('comment', { 
-      title: 'Comment List',
-      data: result, 
-      });
-  });
-});
-
-// app.get('/books', (req, res) => {
-//   db.all("SELECT * FROM books", (err, result) => {
-//     if (err) {
-//       return res.status(500).send(err.message);
-//     }
-//     res.render('books', { 
-//       title: 'Books',
-//       data: result, 
-//       });
-//   });
-// });
-
 //book information
 app.get('/bookdetail/:book_id', (req, res) => {
   const book_id = req.params.book_id;
@@ -370,9 +332,11 @@ app.get('/bookdetail/:book_id', (req, res) => {
   });
 });
 
-app.post('/checkout', IsLoggedin, async (req, res) => {
+app.post('/checkout/:cart_id', IsLoggedin, async (req, res) => {
+  const {cart_id} = req.params;
+  console.log(`cart_id = ${cart_id}`)
   const userId = req.session.user_id;
-  db.all('SELECT * FROM CartItems INNER JOIN Books ON CartItems.book_id = Books.book_id WHERE cart_id = ?', [userId], (err, items) => {
+  db.all('SELECT * FROM CartItems INNER JOIN Books ON CartItems.book_id = Books.book_id WHERE cart_id = ?', [cart_id], (err, items) => {
       if (err) {
           console.error('Error querying cart items:', err);
           res.status(500).send('Internal Server Error');
@@ -406,9 +370,10 @@ app.post('/checkout', IsLoggedin, async (req, res) => {
                       console.error('Error inserting order item into database:', err);
                       return;
                   }
+                  console.log(`${item.book_id} is be recorded`)
               });
           });
-          db.run('DELETE FROM ShoppingCart WHERE usr_id = ?', [userId], function(err) {
+          db.run('DELETE FROM ShoppingCart WHERE user_id = ?', [userId], function(err) {
               if (err) {
                   console.error('Error clearing cart items:', err);
                   return;
@@ -420,7 +385,7 @@ app.post('/checkout', IsLoggedin, async (req, res) => {
   });
 });
 
-
+//order detail
 app.get('/order/:orderId', IsLoggedin, (req, res) => {
   const { orderId } = req.params;
 
@@ -442,17 +407,26 @@ app.get('/order/:orderId', IsLoggedin, (req, res) => {
         res.status(500).send('Internal Server Error');
         return;
       }
-
-      res.render('orderDetail', {
-        order,
-        orderItems,
-        username: req.session.username
-      });
+      console.log(orderItems)
+      if(order.status == 'Pending'){
+        res.render('shipping', {
+          order,
+          orderItems,
+          username: req.session.username
+        });
+      }else if(order.status == 'Waiting for payment'){
+        res.render('payment', {
+          order,
+          orderItems,
+          username: req.session.username
+        });
+      }
+      
     });
   });
 });
 
-
+//order list
 app.get('/orders', IsLoggedin, (req, res) => {
   const userId = req.session.user_id;
   db.all('SELECT * FROM Orders WHERE user_id = ?', [userId], (err, orders) => {
@@ -464,8 +438,93 @@ app.get('/orders', IsLoggedin, (req, res) => {
       res.render('order', { orders, username: req.session.username });
   });
 });
+app.get('/orderJson', (req, res) => {
+  // const userId = req.session.user_id;
+  db.all('SELECT * FROM Orders', (err, orders) => {
+      if (err) {
+          console.error('Error querying orders:', err);
+          res.status(500).send('Internal Server Error');
+          return;
+      }
+      res.json(orders)
+  });
+});
+app.get('/shippingJson', (req, res) => {
+  // const userId = req.session.user_id;
+  db.all('SELECT * FROM ShippingAddresses', (err, orders) => {
+      if (err) {
+          console.error('Error querying orders:', err);
+          res.status(500).send('Internal Server Error');
+          return;
+      }
+      res.json(orders)
+  });
+});
 
+//shipping information
+app.post('/process-shipping/:order_id', (req, res) => {
+  const query = `INSERT INTO ShippingAddresses (order_id, address_line1, city, state, postal_code, country, phone_number) VALUES ( ?, ?, ?, ?, ?, ?, ?)`;
 
+  const { addressLine1, city, state, postalCode, country, phoneNumber } = req.body;
+  const { order_id } = req.params; 
+  db.run(query, [order_id, addressLine1, city, state, postalCode, country, phoneNumber], function (err) {
+    if (err) {
+      console.error('Error inserting order into database:', err);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+    db.run(`UPDATE Orders SET status = 'Waiting for payment', shipping_id = ${this.lastID} WHERE order_id = ${order_id};`, function(err){
+      console.log('Update order status succesfully!!')
+      res.redirect(`/order/${order_id}`)
+      // res.render('payment', {username: req.session.username});
+    })
+  });
+});
+
+//payment
+app.post('/process-payment/:order_id', (req, res) => {
+  const {cardNumber, cardHolderName, expiryDate, cvv, paymentMethod} = req.body;
+  const {order_id} = req.params;
+  const insertQuery = `INSERT INTO PaymentMethods (payment_method, card_number, card_expiry_date, card_holder_name, cvc) 
+                     VALUES (?, ?, ?, ?, ?)`;
+  db.run(insertQuery, [paymentMethod, cardNumber, expiryDate, cardHolderName, cvv], function(err) {
+    if (err) {
+      console.error('Error inserting data into PaymentMethods table:', err);
+    } else {
+      console.log(`Payment method ${this.lastID} inserted successfully.`);
+      b.run(`UPDATE Orders SET status = 'Shipping', shipping_id = ${this.lastID} WHERE order_id = ${order_id};`, function(err){
+        console.log('Update order status succesfully!!')
+        res.render('confirmation',{username: req.sesssion.username})
+        // res.render('payment', {username: req.session.username});
+      })
+    }
+  });
+});
+
+//
+app.post('/search', (req, res) => {
+  const { search } = req.body;
+  var query;
+  if(search == ""){
+    query = `SELECT * FROM Books `;
+  }else{
+    query = `SELECT * FROM Books WHERE title LIKE '%${search}%' or author LIKE '%${search}%' or ISBN LIKE '%${search}%'`;
+  }
+  db.all(query,function(err, result) {
+    if (err) {
+      return res.status(500).send(err.message);
+    }
+    console.log(result)
+    res.render('books', { 
+      title: 'Search',
+      books: result, 
+      search: search,
+      username: req.session.username,
+      bestseller: null
+
+      });
+  });
+});
 app.post('/search', (req, res) => {
   const { search } = req.body;
   const query = `SELECT * FROM feedback WHERE icecreamtype LIKE '%${search}%'`;
