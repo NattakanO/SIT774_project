@@ -46,6 +46,14 @@ body, html {
     font-size: 40px;
     letter-spacing: 10px;
 }
+.toast {
+    position: fixed;
+    top: 0;
+    align-items: center;
+    width: 500px;
+    z-index: 10000;
+    padding: 0.5rem;
+  }
 </style>
 
 <div class="parallax">
@@ -53,7 +61,15 @@ body, html {
     <span class="border">CHAPTERS</span>
   </div>
 </div>
-
+<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-delay="3000">
+  <div class="toast-header bg-success text-white">
+    <strong class="me-auto">Success</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+  </div>
+  <div class="toast-body">
+    Login successful!
+  </div>
+</div>
 <div class="content">
   <h1>Welcome to CHAPTERS</h1>
   <p>Explore our vast collection of books covering various genres, from fiction to non-fiction, mystery to romance, and more!</p>
@@ -62,5 +78,11 @@ body, html {
 </div>
 
 <div class="parallax2"></div>
-
+<script>
+  var toast = new bootstrap.Toast(document.querySelector('.toast'));
+  <% if (loginSuccess) { %>
+  
+  toast.show();
+<% } %>
+</script>
 <%- include('footer'); -%>
