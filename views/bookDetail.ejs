@@ -33,9 +33,10 @@
   }
 </style>
 <div class="col-md-10 mx-auto">
-  <div class="row bg-white p-4 my-4 rounded">
+  <h2 class="text-start mt-3"><%= book.title %></h2>
+  <div class="row bg-white p-4 my-4 rounded shadow">
     <div class="col-md-5 text-center">
-      <h2 class="text-start"><%= book.title %></h2>
+      
       <img src="../<%= book.cover_image_url %>" alt="<%= book.title %>" width="250" height="auto">
     </div>
     <div class="col-md-5">
@@ -56,14 +57,14 @@
               <label for="quantity" class="form-label me-3">Quantity</label>
               <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="<%= book.stock_quantity %>" required>
           </div>
-          <button class="btn btn-danger" type="submit">Add to Cart</button>
+          <button class="btn" type="submit" style="background-color: #94618E; color: white;"><i class="bi bi-cart" ></i> Add to Cart</button>
       </form>
       </div>
     </div>
   </div>
 
   <h3>You May Also Like</h3>
-  <div class="my-3 rounded bg-white">
+  <div class="my-3 rounded bg-white shadow">
     <div id="you-may-also-like" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner p-3">
         <% for (let i = 0; i < Math.ceil(books.length / 5); i++) { %>
@@ -99,6 +100,68 @@
       </button>
     </div>
   </div>
+
+  <% if (reviews.length > 0) { %>
+    <h3 class="mt-4">Reviews</h3>
+  <section class="container my-5 bg-white shadow rounded py-2" style="overflow-y: auto; max-height: 400px;">
+  <div class="row">
+    <div class="col-md-12 " >
+      <ul class="list-group">
+        <% reviews.forEach(function(review) { %>
+        <li class="list-group-item" style="border: none;">
+          <div class="d-flex justify-content-between">
+            <div>
+              <%  const reviewDate = new Date(review.review_date);
+              const formattedDate = reviewDate.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+              });
+              %>
+              <h5 class=" text-warning"><% for ( let j = 0; j < review.rating ; j++ ) { %>
+                ★
+              <% } %>
+              </h5>
+              <p><%= review.review_text %></p>
+              <small class="text-muted">Reviewed by: <%= review.first_name %>  <%= review.last_name %></small>
+            </div>
+            <small class="text-muted"><%= formattedDate %></small>
+          </div>
+          <hr>
+        </li>
+        <% }); %>
+      </ul>
+    </div>
+  </div>
+</section>
+
+    <% } %>
+    <section class="container my-5 bg-white shadow p-3 py-5 rounded">
+      <h2 class="text-center mb-4">Feedback Form</h2>
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <form action="/feedback/<%= book.book_id %>" method="post">
+            <div class="mb-3">
+              <label for="rating" class="form-label">Rating (1-5)</label>
+              <input type="number" class="form-control" id="rating" name="rating" min="1" max="5" required>
+            </div>
+            <div class="mb-3">
+              <label for="reviewText" class="form-label">Review Text</label>
+              <textarea class="form-control" id="reviewText" name="reviewText" rows="3" required></textarea>
+            </div>
+            <div class="d-grid gap-2 my-2">
+              <button type="submit" class="btn" style="background-color: #94618E; color: white;">SUBMIT</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+  <%- include('footer'); -%>
+  
+  
   
  
   

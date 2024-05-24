@@ -322,13 +322,20 @@ app.get('/bookdetail/:book_id', (req, res) => {
       if (err) {
         return res.status(500).send(err.message);
       }
-      res.render('bookDetail', { 
-        title: bookdetail[0].title,
-        book: bookdetail[0], 
-        books: books,
-        username: req.session.username
-        });
+      db.all(`SELECT * FROM UserReviews as ur JOIN users as u ON u.user_id = ur.user_id WHERE book_id == ${bookdetail[0].book_id}`,function(err, reviews) {
+        if (err) {
+          return res.status(500).send(err.message);
+        }
+        res.render('bookDetail', { 
+          title: bookdetail[0].title,
+          book: bookdetail[0], 
+          books: books,
+          username: req.session.username,
+          reviews: reviews
+          });
+      });
     });
+
   });
 });
 
@@ -525,18 +532,18 @@ app.post('/search', (req, res) => {
       });
   });
 });
-app.post('/search', (req, res) => {
-  const { search } = req.body;
-  const query = `SELECT * FROM feedback WHERE icecreamtype LIKE '%${search}%'`;
-  db.all(query,function(err, result) {
+
+//feedback
+app.post('/feedback/:book_id', IsLoggedin, (req, res) => {
+  const {rating, reviewText } = req.body;
+  const {book_id} = req.params
+  const user_id = req.session.user_id;
+  const review_at = new Date().toISOString();
+  db.run("INSERT INTO UserReviews (user_id, book_id, rating, review_text, review_date) VALUES (?, ?, ?, ?, ?)", [user_id, book_id, rating, reviewText, review_at], function(err) {
     if (err) {
       return res.status(500).send(err.message);
     }
-    res.render('comment', { 
-      title: 'Search Results',
-      data: result, 
-      search: search
-      });
+    res.redirect(`/bookDetail/${book_id}`)
   });
 });
 
