@@ -27,6 +27,33 @@ function IsLoggedin(req, res, next) {
   res.redirect('/login');
 }
 
+async function sendWelcomeEmail(email) {
+  try {
+    // Configure the transporter
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'sit774.project2024@gmail.com', 
+        pass: 'znbw csmu xayb jkah', 
+      },
+    });
+
+    // Send the email
+    await transporter.sendMail({
+      from: 'sit774.project2024@gmail.com',
+      to: email,
+      subject: 'Welcome to CHAPTERs bookshop',
+      text: 'Thank you for registering!',
+    });
+
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+}
+
 app.get('/index.js', function(req, res) {
   res.sendFile(__dirname + '/index.js');
 });
@@ -72,20 +99,7 @@ app.post('/register', async (req, res) => {
           return;
       }
       // Send email to the user
-      try {
-          const transporter = nodemailer.createTransport();
-
-          await transporter.sendMail({
-              from: 'nattakan.ty3090@gmail.com',
-              to: email,
-              subject: 'Welcome to Our Website',
-              text: 'Thank you for registering!'
-          });
-
-          console.log('Email sent successfully');
-      } catch (error) {
-          console.error('Error sending email:', error);
-      }
+      sendWelcomeEmail(email);
       req.session.username = username;
       req.session.user_id = this.lastID;
       res.redirect('/');
