@@ -544,6 +544,19 @@ app.post('/process-payment/:order_id', (req, res) => {
     });
   });
 
+app.get('/books/genre/:genre/:subgenre', (req, res) => {
+  const { genre, subgenre } = req.params;
+  const query = `SELECT * FROM Books WHERE genre = ? AND subgenre = ?`;
+  
+  db.all(query, [genre, subgenre], (err, books) => {
+      if (err) {
+          console.error('Error fetching books:', err);
+          res.status(500).send('Internal server error');
+      } else {
+          res.render('booknav', { title: 'Search',search: "",books, genre, subgenre, username: req.session.username  });
+      }
+  });
+});
 
 //search
 app.post('/search', (req, res) => {
@@ -558,7 +571,6 @@ app.post('/search', (req, res) => {
     if (err) {
       return res.status(500).send(err.message);
     }
-    console.log(result)
     res.render('books', { 
       title: 'Search',
       books: result, 
