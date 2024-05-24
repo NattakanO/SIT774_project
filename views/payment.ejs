@@ -43,7 +43,7 @@
       <!-- Payment Form -->
       <div class="col-md-6 rounded p-3 col-12" style="background-color: #f4decb;">
         <h3 style="color: #94618E;">Payment Information</h3>
-        <form action="/process-payment" method="post" id="paymentForm">
+        <form action="/process-payment/<%= order.order_id %>" method="post" id="paymentForm">
             <div class="mb-3">
                 <label for="cardType" class="form-label">Card Type</label>
                 <select class="form-select" id="paymentMethod" name="paymentMethod" required>

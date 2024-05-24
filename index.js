@@ -32,7 +32,7 @@ app.get('/index.js', function(req, res) {
 });
 //home page
 app.get('/', (req, res, next) => {
-  res.render('index', {  username: req.session.username});
+  res.render('index', {  username: req.session.username, loginSuccess:false});
 });
 app.get('/books', (req, res, next) => {
   const query = `SELECT * FROM Books`;
@@ -111,7 +111,7 @@ app.get('/users', (req, res) => {
 
 //login
 app.get('/login', (req, res) => {
-  res.render('login', { errorMessage: null });
+  res.render('login', { errorMessage: null});
 });
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -128,19 +128,20 @@ app.post('/login', (req, res) => {
         const passwordMatch = await bcrypt.compare(password, row.password_hash);
         if (passwordMatch) {
           req.session.username = username;
-          req.session.user_id = row.user_id
-          res.redirect('/');
-        } else {
-          res.render('login', { errorMessage: 'Invalid username or password' });
+          req.session.user_id = row.user_id;
+          res.render('index', { loginSuccess: true ,errorMessage: null, username:req.session.username});
+          return;
         }
       } catch (error) {
-          console.error('Error comparing passwords:', error);
-          res.status(500).send('Internal Server Error');
-        }} else {
-          res.render('login', { errorMessage: 'Invalid username or password' });
+        console.error('Error comparing passwords:', error);
+        res.status(500).send('Internal Server Error');
+        return;
       }
+    }
+    res.render('login', { errorMessage: 'Invalid username or password' });
   });
 });
+
 
 //log out
 app.get('/logout', (req, res) => {
@@ -490,25 +491,61 @@ app.post('/process-shipping/:order_id', (req, res) => {
 
 //payment
 app.post('/process-payment/:order_id', (req, res) => {
-  const {cardNumber, cardHolderName, expiryDate, cvv, paymentMethod} = req.body;
-  const {order_id} = req.params;
-  const insertQuery = `INSERT INTO PaymentMethods (payment_method, card_number, card_expiry_date, card_holder_name, cvc) 
-                     VALUES (?, ?, ?, ?, ?)`;
-  db.run(insertQuery, [paymentMethod, cardNumber, expiryDate, cardHolderName, cvv], function(err) {
-    if (err) {
-      console.error('Error inserting data into PaymentMethods table:', err);
-    } else {
-      console.log(`Payment method ${this.lastID} inserted successfully.`);
-      b.run(`UPDATE Orders SET status = 'Shipping', shipping_id = ${this.lastID} WHERE order_id = ${order_id};`, function(err){
-        console.log('Update order status succesfully!!')
-        res.render('confirmation',{username: req.sesssion.username})
-        // res.render('payment', {username: req.session.username});
-      })
-    }
-  });
-});
+  const { cardNumber, cardHolderName, expiryDate, cvv, paymentMethod } = req.body;
+  const { order_id } = req.params;
 
-//
+  // Assuming you have an array of items in the order containing book_id and quantity
+  const orderItems = req.body.orderItems; // Adjust this based on how you send the data
+    const insertPaymentQuery = `INSERT INTO PaymentMethods (payment_method, card_number, card_expiry_date, card_holder_name, cvc) 
+                                VALUES (?, ?, ?, ?, ?)`;
+    db.run(insertPaymentQuery, [paymentMethod, cardNumber, expiryDate, cardHolderName, cvv], function (err) {
+      if (err) {
+        console.error('Error inserting data into PaymentMethods table:', err);
+        res.status(500).send('Internal Server Error');
+        return;
+      }
+      const payment_id = this.lastID;
+
+      // Update order status to 'Shipping' and associate payment_id
+      const updateOrderQuery = `UPDATE Orders SET status = 'Shipping', payment_id = ? WHERE order_id = ?`;
+      db.run(updateOrderQuery, [payment_id, order_id], function (err) {
+        if (err) {
+          db.rollback(() => {
+            console.error('Error updating order status:', err);
+            res.status(500).send('Internal Server Error');
+          });
+          return;
+        }
+        const orderItemQuery = `SELECT * from OrderItems WHERE order_id = ${order_id}`;
+      db.all(orderItemQuery, function (err, orderItems) {
+        if (err) {
+          db.rollback(() => {
+            console.error('Error updating order status:', err);
+            res.status(500).send('Internal Server Error');
+          });
+          return;
+        }
+        orderItems.forEach((item) => {
+          const { book_id, quantity } = item;
+          const updateStockQuery = `UPDATE Books SET stock_quantity = stock_quantity - ? WHERE book_id = ?`;
+          db.run(updateStockQuery, [quantity, book_id], function (err) {
+            if (err) {
+              db.rollback(() => {
+                console.error('Error updating stock_quantity for book:', err);
+                res.status(500).send('Internal Server Error');
+              });
+              return;
+            }
+          });
+        });
+          res.render('confirmation', { username: req.session.username });
+      });
+      });
+    });
+  });
+
+
+//search
 app.post('/search', (req, res) => {
   const { search } = req.body;
   var query;
