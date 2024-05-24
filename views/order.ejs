@@ -6,23 +6,23 @@
         <div class="list-group">
             <% orders.forEach(function(order) { %>
                 <% 
-                    let statusColor;
-                    switch (order.status) {
-                        case 'Pending':
-                            statusColor = 'text-warning';
-                            break;
-                        case 'Shipping':
-                            statusColor = 'text-primary';
-                            break;
-                        case 'Delivered':
-                            statusColor = 'text-success';
-                            break;
-                        case 'Cancelled':
-                            statusColor = 'text-danger';
-                            break;
-                        default:
-                            statusColor = 'text-secondary';
-                    }
+                let statusColor;
+                switch (order.status) {
+                  case 'Pending':
+                    statusColor = 'bg-warning text-white';
+                    break;
+                  case 'Shipping':
+                    statusColor = 'bg-primary text-white';
+                    break;
+                  case 'Delivered':
+                    statusColor = 'bg-success text-white';
+                    break;
+                  case 'Cancelled':
+                    statusColor = 'bg-danger text-white';
+                    break;
+                  default:
+                    statusColor = 'bg-secondary text-white';
+                }
                     const orderDate = new Date(order.order_date);
                     const formattedDate = orderDate.toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -32,9 +32,10 @@
                         minute: '2-digit'
                     });
                 %>
-                <a href="/order/<%= order.order_id %>" class="list-group-item list-group-item-action">
+                <a href="/order/<%= order.order_id %>" class="list-group-item list-group-item-action mt-2">
                     <span>Order #<%= order.order_id %> - <%= formattedDate %></span>
-                    <span class="<%= statusColor %> float-end"><%= order.status %></span>
+                    <span class="<%= statusColor %> float-end rounded-pill p-2 py-1"><%= order.status %></span>
+                    <a href="/order-history/<%= order.order_id %>" class="btn" style="background-color: #683f7a;color: white;">View Details</a>
                 </a>
             <% }); %>
         </div>

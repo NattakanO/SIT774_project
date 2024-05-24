@@ -1,0 +1,63 @@
+<%- include('header'); -%>
+<%- include('navbar.ejs', username) %>
+
+<div class="container my-5">
+    <h2>Order History</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Order Items</h5>
+            <ul class="list-group">
+                <% orderItems.forEach(function(item) { %>
+                    <li class="list-group-item">
+                      <div class="row">
+                        <div class="col-md-2">
+                          <img src="../<%= item.cover_image_url%>" alt="<%= item.title %>" width="150" height="auto">
+                        </div>
+                          <div class="col-md-5">
+                            <p><strong>Book title:</strong> <%= item.title %></p>
+                            <p><strong>Quantity:</strong> <%= item.quantity %></p>
+                            <p><strong>Price:</strong> $<%= item.price.toFixed(2) %></p>
+                          </div>
+                      </div>
+                      
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Order History</h5>
+            <ul class="list-group">
+                <% orderHistory.forEach(function(history) { %>
+                    <li class="list-group-item">
+                      <% 
+                      let statusColor;
+                      switch (history.status) {
+                        case 'Pending':
+                          statusColor = 'bg-warning text-white';
+                          break;
+                        case 'Shipping':
+                          statusColor = 'bg-primary text-white';
+                          break;
+                        case 'Delivered':
+                          statusColor = 'bg-success text-white';
+                          break;
+                        case 'Cancelled':
+                          statusColor = 'bg-danger text-white';
+                          break;
+                        default:
+                          statusColor = 'bg-secondary text-white';
+                      }
+                    %>
+                        <p><strong>Status:</strong> <span class="<%= statusColor %>  rounded-pill p-2 py-1 my-3"> <%= history.status %></span></p>
+                        <p><strong>Status Change Date:</strong> <%= new Date(history.status_change_date).toLocaleString() %></p>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<%- include('footer'); -%>

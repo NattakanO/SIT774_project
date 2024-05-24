@@ -381,9 +381,17 @@ app.post('/checkout/:cart_id', IsLoggedin, async (req, res) => {
               res.status(500).send('Internal Server Error');
               return;
           }
-
+          const historyQuery = `INSERT INTO OrderHistory (order_id, status, status_change_date) VALUES (?, ?, ?)`;
           const orderId = this.lastID;
-
+          const status_change_date = new Date().toISOString();
+          db.run(historyQuery, [orderId, status, status_change_date], function (historyErr) {
+            if (historyErr) {
+              console.error('Error inserting order history into database:', historyErr);
+              res.status(500).send('Internal Server Error');
+              return;
+            }
+            console.log('Order status history inserted successfully.')
+          });
           // Insert cart items into OrderItems and remove from CartItems
           const orderItemsQuery = `INSERT INTO OrderItems (order_id, book_id, quantity, price) VALUES (?, ?, ?, ?)`;
           items.forEach(item => {
@@ -404,6 +412,7 @@ app.post('/checkout/:cart_id', IsLoggedin, async (req, res) => {
           });
           res.redirect(`/orders`);
       });
+      
   });
 });
 
@@ -501,6 +510,16 @@ app.post('/process-shipping/:order_id', (req, res) => {
       // res.render('payment', {username: req.session.username});
     })
   });
+  const historyQuery = `INSERT INTO OrderHistory (order_id, status, status_change_date) VALUES (?, ?, ?)`;
+  const status_change_date = new Date().toISOString();
+  db.run(historyQuery, [order_id, 'Waiting for payment', status_change_date], function (historyErr) {
+    if (historyErr) {
+      console.error('Error inserting order history into database:', historyErr);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+    console.log('Order status history inserted successfully.')
+  });
 });
 
 //payment
@@ -553,6 +572,16 @@ app.post('/process-payment/:order_id', (req, res) => {
           });
         });
           res.render('confirmation', { username: req.session.username });
+      });
+      const historyQuery = `INSERT INTO OrderHistory (order_id, status, status_change_date) VALUES (?, ?, ?)`;
+      const status_change_date = new Date().toISOString();
+      db.run(historyQuery, [order_id, 'Shipping', status_change_date], function (historyErr) {
+        if (historyErr) {
+          console.error('Error inserting order history into database:', historyErr);
+          res.status(500).send('Internal Server Error');
+          return;
+        }
+        console.log('Order status history inserted successfully.')
       });
       });
     });
@@ -609,6 +638,34 @@ app.post('/feedback/:book_id', IsLoggedin, (req, res) => {
     res.redirect(`/bookDetail/${book_id}`)
   });
 });
+
+// Assuming you have defined your routes and database connection setup...
+
+// Route to display order history
+app.get('/order-history/:order_id', (req, res) => {
+  const { order_id } = req.params;
+
+    // Retrieve order items
+    const getOrderItemsQuery = `SELECT * FROM OrderItems as o JOIN Books as b ON b.book_id = o.book_id WHERE order_id = ?`;
+    db.all(getOrderItemsQuery, [order_id], (itemsErr, orderItems) => {
+      if (itemsErr) {
+        console.error('Error retrieving order items:', itemsErr);
+        res.status(500).send('Internal Server Error');
+        return;
+      }
+      // Retrieve order history
+      const getOrderHistoryQuery = `SELECT * FROM OrderHistory WHERE order_id = ?`;
+      db.all(getOrderHistoryQuery, [order_id], (historyErr, orderHistory) => {
+        if (historyErr) {
+          console.error('Error retrieving order history:', historyErr);
+          res.status(500).send('Internal Server Error');
+          return;
+        }
+        res.render('orderHistory', {orderItems, orderHistory, username:req.session.username });
+      });
+    });
+  });
+
 
 app.use(express.static('public_html'));
 
